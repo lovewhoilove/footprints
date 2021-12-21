@@ -4,5 +4,5 @@ module.exports = {
     trailingComma: 'all', //行尾使用逗号
     arrowParens: 'always', //箭头函数总是使用括号
     printWidth: 120,
-    tabWidth: 2, //代码缩进
+    tabWidth: 4, //代码缩进
 };
