@@ -8,42 +8,39 @@ import {
     RES_UNAUTHORIZED_CODE
 } from "./constants";
 
-// create an axios instance
+//创建一个axios实例
 const service = axios.create({
-    baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-    // withCredentials: true, // send cookies when cross-domain requests
-    timeout: REQ_OVERTIME_DURATION // request timeout
+    baseURL: process.env.VUE_APP_BASE_API,// url = base url + request url
+    // withCredentials: true, //跨域请求时发送cookie
+    timeout: REQ_OVERTIME_DURATION,
 });
 
-// request interceptor
+//request拦截器
 service.interceptors.request.use(
     config => {
-        // do something before request is sent
-
+        //在发送请求之前执行某些操作
         // config.headers["Content-Type"] = "application/json";
         return config;
     },
     error => {
-        // do something with request error
-        console.log(error); // for debug
+        //请求发生错误时执行某些操作
+        console.log(error);
         return Promise.reject(error);
     }
 );
 
-// response interceptor
+//response拦截器
 service.interceptors.response.use(
     /**
-     * If you want to get http information such as headers or status
-     * Please return  response => response
+     * 统一处理不同转态码的逻辑，有错误也直接统一的 MessageBox 提示，在真正使用接口请求的时候不需要做这种逻辑判断了。
      */
-
     response => {
         const res = response.data;
-        // if the custom code is not 2000, it is judged as an error.
+        //如果自定义代码不是2000，则判断为错误。
         if (res.code !== RES_SUCCESS_DEFAULT_CODE) {
-            // 4010: Illegal token; Other clients logged in;  Token expired;
+            //若状态码为4010，token不合法或在其他客户端上登录，又或是token已过期
             if (res.code === RES_UNAUTHORIZED_CODE) {
-                // to re-login
+                //重新登录
                 MessageBox.confirm(
                     "您已经登出，您可以取消以停留在此页面，或再次登录",
                     "确认注销",
@@ -56,7 +53,7 @@ service.interceptors.response.use(
                     logout();
                 });
             } else if (res.code === RES_PERMISSION_DENIED_CODE) {
-                // token不存在,请重新登录账户
+                //token不存在，重新登录账户
                 Message({
                     message: res.desc || res.message || "Error",
                     type: "error",
@@ -72,13 +69,12 @@ service.interceptors.response.use(
                     duration: ERR_MESSAGE_SHOW_DURATION
                 });
             }
-            return Promise.reject(new Error(res.message || "Error"));
         } else {
             return res;
         }
     },
     error => {
-        console.log("err", error); // for debug
+        console.log("err", error);
         Message({
             message: error.desc || error.message || "服务器出错",
             type: "error",
@@ -88,14 +84,16 @@ service.interceptors.response.use(
     }
 );
 
-export function post(endpoint, params) {
-    return service.post(endpoint, params);
-}
-
+//对外的get方法
 export function get(endpoint, params) {
     return service.get(endpoint, {
         params: { ...params }
     });
+}
+
+//对外的post方法
+export function post(endpoint, params) {
+    return service.post(endpoint, params);
 }
 
 export default service;
