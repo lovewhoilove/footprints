@@ -4,21 +4,18 @@
             :background="background"
             :current-page.sync="currentPage"
             :page-size.sync="pageSize"
-            :pager-count="11"
             :layout="layout"
             :page-sizes="pageSizes"
             :total="total"
             v-bind="$attrs"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
-        >
-        </el-pagination>
+        />
     </div>
 </template>
 
 <script>
 export const defaultPageSizes = [10, 20, 30, 50];
-
 export default {
     name: 'Pagination',
     props: {
@@ -90,12 +87,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .pagination-container {
     background: #fff;
     padding: 5px 16px 36px 16px;
 }
-
 .pagination-container.hidden {
     display: none;
 }

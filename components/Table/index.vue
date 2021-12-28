@@ -57,19 +57,16 @@ import Pagination, { defaultPageSizes } from '@/components/Pagination';
 const tableKey = Math.random().toString(16).substr(2);
 
 const defaultPageInfo = {
-    first: true, //是否为第一页
-    last: false, //是否为最后一页
-    number: 0, //第几页
-    size: 10, //每页多少条记录
-    totalPages: 1, //总页数
-    totalSize: 0, //总记录数
+    first: true,
+    last: false,
+    number: 0,
+    size: 10,
+    totalPages: 1,
+    totalSize: 0,
 };
-
 export default {
     name: 'STable',
-    computed: {
-        Pagination,
-    },
+    components: { Pagination },
     props: {
         selection: { type: [Boolean, String], default: false }, // 是否开启checkbox选择
         highlightCurrentRow: { type: Boolean, default: true },
