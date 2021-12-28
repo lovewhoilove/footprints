@@ -1,4 +1,7 @@
 const User = require("../models/user");
+const PageInfo = require("../common/pageInfo");
+const PageResult = require("../common/pageResult");
+
 
 /**
  * 查询用户
@@ -18,6 +21,47 @@ async function getUsers(ctx) {
         status: 200,
         data: lists
     };
+}
+
+/**
+ * 分页查询用户
+ * @param {Object} ctx
+ */
+async function pageUserList(ctx) {
+    let { username = "", page = 1, size = 10 } = ctx.request.body;
+
+    let query = User.find({});
+    let conditions = {};
+    if (username !== "") {
+        query.where("username", username);
+        conditions["username"] = username;
+    }
+    // 每页大小
+    query.skip((page - 1) * size);
+    query.limit(size);
+    try {
+        // 查询分页数据
+        const lists = await query.exec();
+
+        // 计算数据总数
+
+        const result = await User.find(conditions);
+        const totalPage = Math.ceil(result.length / size);
+        const totalSize = result.length;
+        const pageInfo = new PageInfo(
+            page === 1,
+            page === totalPage,
+            page,
+            size,
+            totalPage,
+            totalSize
+        );
+        const pageResult = new PageResult(2000, "查询成功", lists, pageInfo);
+        ctx.body = pageResult;
+    } catch (e) {
+        const pageResult = new PageResult(5000, "查询失败", [], {});
+        ctx.body = pageResult;
+    }
 }
 
 /**
@@ -59,4 +103,4 @@ async function signup(ctx) {
     }
 }
 
-module.exports = { getUsers, signup };
+module.exports = { getUsers, signup, pageUserList };
