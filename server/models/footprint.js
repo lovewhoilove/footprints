@@ -13,7 +13,7 @@ const footprintSchema = new Schema({
     latitude: Number, // 纬度
     description: String, // 描述信息
     photos: Array, // 照片url数组
-    createTime: { type: Date, default: Date.now } // 数据新增时间
+    createTime: { type: String, default: new Date().toLocaleString() } // 数据新增时间
 });
 
 module.exports = mongoose.model("Footprint", footprintSchema);
