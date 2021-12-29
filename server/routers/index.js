@@ -1,6 +1,7 @@
 const Router = require("koa-router");
 const { getUsers, signup, pageUserList } = require("../controller/user");
 const footprintCtrl = require("../controller/footprint");
+const uploadCtrl = require("../controller/upload");
 
 const router = new Router();
 
@@ -16,5 +17,7 @@ router.post("/user/pageUserList", pageUserList);
 router.post("/footprint/pageList", footprintCtrl.pageList);
 // 新增足迹点
 router.post("/footprint/add", footprintCtrl.add);
+//七牛云token
+router.get("/qiniu/upload/token", uploadCtrl.signature);
 
 module.exports = router;
