@@ -25,20 +25,23 @@
                     <el-input v-model="formData.place" placeholder="请输入" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="经度" prop="longitude">
-                    <el-input
-                        v-model="formData.longitude"
-                        placeholder="请输入（后续实现自动获取）"
-                        clearable
-                    ></el-input>
+                    <el-input v-model="formData.longitude" placeholder="请输入（点击右侧按钮地图定位）" clearable>
+                        <el-button slot="append" icon="el-icon-location" @click="locationHandle"></el-button>
+                    </el-input>
                 </el-form-item>
                 <el-form-item label="纬度" prop="latitude">
-                    <el-input v-model="formData.latitude" placeholder="请输入（后续实现自动获取）" clearable></el-input>
+                    <el-input v-model="formData.latitude" placeholder="请输入（点击右侧按钮地图定位）" clearable>
+                        <el-button slot="append" icon="el-icon-location" @click="locationHandle"></el-button>
+                    </el-input>
                 </el-form-item>
                 <el-form-item label="旅游日期" prop="travelDate">
                     <el-date-picker
                         v-model="formData.travelDate"
-                        type="date"
-                        placeholder="选择日期"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        format="yyyy-MM-dd"
                         :style="{ width: '100%' }"
                     ></el-date-picker>
                 </el-form-item>
@@ -66,14 +69,22 @@
 <script>
 import { post } from '@/shared/request';
 import SingleImage from '@/components/Upload/SingleImage';
+import { formatDate } from '@/shared/utils';
+
 export default {
     name: 'CreatePointDialog',
     components: { SingleImage },
     inheritAttrs: false,
-    props: {},
+    props: {
+        data: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     data() {
         return {
             title: '足迹点新增',
+            locateDialogVisible: false,
             formData: {
                 country: undefined,
                 city: undefined,
@@ -147,26 +158,45 @@ export default {
     computed: {},
     created() {},
     methods: {
-        onOpen() {},
+        onOpen() {
+            console.log(this.data);
+            const { _id, travelDate, photos } = this.data;
+            if (!_id) {
+                return;
+            }
+            this.title = '足迹点编辑';
+            Object.assign(this.formData, this.data, {
+                travelDate: travelDate.split('~'),
+                photos: photos && Array.isArray(photos) ? photos[0] : photos,
+            });
+        },
         onClose() {},
         close() {
             this.$emit('update:visible', false);
         },
         handelConfirm() {
-            const params = { ...this.formData };
-            console.log(params);
-            // 临时改为单个文件，后续自己扩展图片上传组件支持多图片上传
-            params.photos = [params.photos];
-            post('/footprint/add', params)
-                .then((res) => {
-                    this.$message.success('保存成功!');
-                    this.$emit('success', res);
-                    this.close();
-                })
-                .catch((err) => {
-                    this.$message.error('保存失败!');
-                    this.close();
-                });
+            this.$refs['elForm'].validate((valid) => {
+                if (!valid) return;
+                const params = { ...this.formData };
+                console.log(params);
+                params.photos = [params.photos];
+                const d = params.travelDate;
+                params.travelDate = [formatDate(d[0]), formatDate(d[1])];
+                const endpoint = this.formData._id ? '/footprint/edit' : '/footprint/add';
+                post(endpoint, params)
+                    .then((res) => {
+                        this.$message.success('保存成功!');
+                        this.$emit('success', res);
+                        this.close();
+                    })
+                    .catch((err) => {
+                        this.$message.error('保存失败!');
+                        this.close();
+                    });
+            });
+        },
+        locationHandle() {
+            window.open('https://latlngpicker.surge.sh/');
         },
     },
 };
