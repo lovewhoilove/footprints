@@ -22,15 +22,15 @@ export default {
     data() {
         return {
             columns: [
-                {
-                    label: 'ID', // 字段名称
-                    field: '_id', // 字段
-                    minWidth: 190, // 自定义字段宽度，不写是自适应宽度
-                },
+                // {
+                //     label: 'ID', // 字段名称
+                //     field: '_id', // 字段
+                //     minWidth: 190, // 自定义字段宽度，不写是自适应宽度
+                // },
                 {
                     label: '用户名',
                     field: 'username',
-                    widminWidthth: 160,
+                    minWidth: 160,
                 },
 
                 {

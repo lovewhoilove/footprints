@@ -19,5 +19,9 @@ router.post("/footprint/pageList", footprintCtrl.pageList);
 router.post("/footprint/add", footprintCtrl.add);
 //七牛云token
 router.get("/qiniu/upload/token", uploadCtrl.signature);
+// 编辑足迹点
+router.post("/footprint/edit", footprintCtrl.edit);
+// 删除足迹点
+router.post("/footprint/del", footprintCtrl.del);
 
 module.exports = router;
